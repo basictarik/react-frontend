@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactPasswordStrength from 'react-password-strength';
+import axios from 'axios';
 
 class SignUp extends React.Component {
     constructor(props) {
@@ -28,6 +28,17 @@ class SignUp extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
+        const newUser = {
+            first_name: e.target[0].value,
+            last_name: e.target[1].value,
+            username: e.target[2].value,
+            password: e.target[3].value,
+            email: e.target[5].value
+        }
+        axios.post('http://localhost:8000/signup/', newUser)
+            /*then(res =>{
+                console.log(res);
+            })*/
     }
 
     render() {
@@ -37,28 +48,33 @@ class SignUp extends React.Component {
                     <div className="form-group">
                         <label>First Name:</label>
                         <br />
-                        <input type="text" placeholder="First Name" required />
+                        <input name="first_name" type="text" placeholder="First Name" required />
                     </div>
                     <div className="form-group">
                         <label>Last Name:</label>
                         <br />
-                        <input type="text" placeholder="Last Name" required />
+                        <input name="last_name" type="text" placeholder="Last Name" required />
                     </div>
                     <div className="form-group">
                         <label>Username:</label>
                         <br />
-                        <input type="text" placeholder="Username" required />
+                        <input name="user" type="text" placeholder="Username" required />
                     </div>
                     <div className="form-group">
                         <label>Password:</label>
                         <br />
-                        <input onChange={this.handleChange} type="password" placeholder="Password" required />
+                        <input name="pw" onChange={this.handleChange} type="password" placeholder="Password" required />
                         <label>{this.state.passwordLength}</label>
                     </div>
                     <div className="form-group">
                         <label>Repeat password:</label>
                         <br />
-                        <input type="password" placeholder="Repeat password" required />
+                        <input name="repeat_pw" type="password" placeholder="Repeat password" required />
+                    </div>
+                    <div className="form-group">
+                        <label>E-mail address:</label>
+                        <br />
+                        <input name="email-addr" type="e-mail address" placeholder="e-mail address" required />
                     </div>
                     <button>
                         Submit
