@@ -35,10 +35,9 @@ class SignUp extends React.Component {
             password: e.target[3].value,
             email: e.target[5].value
         }
-        axios.post('http://localhost:8000/signup/', newUser)
-            /*then(res =>{
-                console.log(res);
-            })*/
+        axios.post('http://localhost:8000/signup/', newUser).then(res => {
+            console.log(res);
+        })
     }
 
     render() {
