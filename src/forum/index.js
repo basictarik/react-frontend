@@ -1,6 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import Pagination from 'react-js-pagination';
+import {withRouter} from 'react-router-dom';
 
 class Forum extends React.Component {
   constructor(props) {
@@ -22,13 +23,19 @@ class Forum extends React.Component {
   }
 
   componentDidMount() {
-    console.log(localStorage.getItem('jwtToken'));
     axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
     axios.get("http://localhost:8000/posts/").then(res => {
       this.setState({
         postsList: res.data
       })
-    })
+    }).catch(function (error) {
+      if (error.response) {
+        console.log('vamos');
+        withRouter(({history}) => {
+          history.push('/login');
+        })
+      }
+    });
   }
 
   handlePageChange(pageNumber) {
