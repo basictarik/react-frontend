@@ -27,13 +27,13 @@ class Login extends React.Component {
                             clearInterval(intervalID);
                         }
                     })
-                }, 28000);
+                }, 20 * 60 * 1000 - 1000);
             });
     }
 
     render() {
         return (
-            <div>
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <form onSubmit={this.handleSubmit}>
                     <div className="form-group">
                         <label>Username:</label>

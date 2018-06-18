@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import Pagination from 'react-js-pagination';
-import {withRouter} from 'react-router-dom';
+import {Redirect} from 'react-router-dom';
 
 class Forum extends React.Component {
   constructor(props) {
@@ -14,12 +14,20 @@ class Forum extends React.Component {
       posts_per_page: 5,
       activePage: 1,
       last_post: 5,
-      first_post: 0
+      first_post: 0,
+      redirect: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleChange2 = this.handleChange2.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
+    this.redirectToLogin = this.redirectToLogin.bind(this);
+  }
+
+  redirectToLogin = function() {
+    this.setState({
+      redirect: true
+    });
   }
 
   componentDidMount() {
@@ -29,14 +37,13 @@ class Forum extends React.Component {
         postsList: res.data
       })
     }).catch(function (error) {
-      if (error.response) {
-        console.log('vamos');
-        withRouter(({history}) => {
-          history.push('/login');
-        })
+      if (error.response.status === 401) {
+        setTimeout(this.redirectToLogin ,3000)
       }
-    });
-  }
+    }.bind(this)
+    )}
+
+  
 
   handlePageChange(pageNumber) {
     this.setState({
@@ -76,6 +83,10 @@ class Forum extends React.Component {
   };
 
   render() {
+    const redirect = this.state.redirect;
+    if (redirect) {
+      return <Redirect to='/login' />;
+    }
     return (
       <div>
         Post Title:
@@ -93,7 +104,7 @@ class Forum extends React.Component {
           value={this.state.text}
         />
         <button className='btn-danger' onClick={this.handleClick}>
-          {this.state.counter}
+          {'Add new post'}
         </button>
         <div>
           <ul>
