@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "ajv": "^6.5.1",
     "babel-loader": "^7.1.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-react-html-attrs": "^2.1.0",
@@ -10,8 +11,11 @@
     "babel-preset-react": "^6.24.1",
     "bootstrap": "^4.1.1",
     "bootstrap-less": "^3.3.8",
+    "css-loader": "^0.28.11",
+    "javascript-time-ago": "^1.0.30",
     "jquery": "^3.3.1",
     "jquery.js": "0.0.2-security",
+    "jwt-decode": "^2.2.0",
     "popper": "^1.0.1",
     "popper.js": "^1.14.3",
     "react": "^16.3.2",
@@ -23,7 +27,8 @@
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.4",
-    "reactstrap": "^6.0.1"
+    "reactstrap": "^6.0.1",
+    "style-loader": "^0.21.0"
   },
   "scripts": {
     "start": "react-scripts start",

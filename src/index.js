@@ -11,9 +11,6 @@ import Forum from '../src/forum/index';
 
 
 class Home extends React.Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     return (

@@ -1,7 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 import Pagination from 'react-js-pagination';
-import {Redirect} from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
+import styles from './forum.css';
+import jwt_decode from 'jwt-decode';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
 
 class Forum extends React.Component {
   constructor(props) {
@@ -24,7 +28,7 @@ class Forum extends React.Component {
     this.redirectToLogin = this.redirectToLogin.bind(this);
   }
 
-  redirectToLogin = function() {
+  redirectToLogin = function () {
     this.setState({
       redirect: true
     });
@@ -38,12 +42,11 @@ class Forum extends React.Component {
       })
     }).catch(function (error) {
       if (error.response.status === 401) {
-        setTimeout(this.redirectToLogin ,3000)
+        setTimeout(this.redirectToLogin, 3000)
       }
     }.bind(this)
-    )}
-
-  
+    )
+  }
 
   handlePageChange(pageNumber) {
     this.setState({
@@ -66,15 +69,19 @@ class Forum extends React.Component {
     if (!this.state.inputPostTitle.length) {
       return;
     }
+    const user_information = jwt_decode(localStorage.getItem('jwtToken'));
+
     const newPost = {
       post_title: this.state.inputPostTitle,
-      post_text: this.state.inputPostText
+      post_text: this.state.inputPostText,
+      original_poster: user_information.username,
     };
     axios.post("http://localhost:8000/posts/", newPost).then(res => {
       const newPost = {
         post_title: res.data.post_title,
         post_text: res.data.post_text,
-        date_posted: new Date().toISOString()
+        original_poster: res.data.original_poster,
+        date_posted: new Date().toISOString(),
       };
       this.setState(prevState => ({
         postsList: prevState.postsList.concat(newPost)
@@ -83,6 +90,8 @@ class Forum extends React.Component {
   };
 
   render() {
+    TimeAgo.locale(en);
+    const timeAgo = new TimeAgo('en-US');
     const redirect = this.state.redirect;
     if (redirect) {
       return <Redirect to='/login' />;
@@ -107,18 +116,18 @@ class Forum extends React.Component {
           {'Add new post'}
         </button>
         <div>
-          <ul>
-            {this.state.postsList.slice(this.state.first_post, this.state.last_post).map(function (post, index) {
-              return (
-                <li key={index}>
-                  <h3>{post.post_title}</h3>
-                  <p>{post.post_text}</p>
-                  <p>{post.date_posted}</p>
-                </li>
-              )
-            }
-            )}
-          </ul>
+          {this.state.postsList.slice(this.state.first_post, this.state.last_post).map(function (post, index) {
+            return (
+              <div key={index} >
+                <header className={styles.head}>
+                  <h2 className={styles.topic}>{post.post_title}</h2>
+                  <p>{"Posted by "} <span style={{ fontStyle: 'italic' }}>{post.original_poster + " " + timeAgo.format(Date.parse(post.date_posted))}</span></p>
+                </header>
+                <p>{post.post_text}</p>
+              </div>
+            )
+          }
+          )}
         </div>
         <div>
           <Pagination

@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import style from './login.css'
 
 
 class Login extends React.Component {
@@ -52,7 +53,6 @@ class Login extends React.Component {
             </div>
         );
     }
-
 }
 
 export default Login;
