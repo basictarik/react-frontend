@@ -1,29 +1,26 @@
 import React from 'react';
 import axios from 'axios';
-import style from './login.css'
-
+import {withRouter} from 'react-router-dom';
 
 class Login extends React.Component {
-    constructor(props) {
-        super(props);
-    };
 
-    handleSubmit(e) {
+    handleSubmit = e => {
         e.preventDefault();
         const loginCredentials = {
             username: e.target[0].value,
             password: e.target[1].value,
         }
         axios.post('http://localhost:8000/login/', loginCredentials).
-            then(res =>{
+            then(res => {
                 window.localStorage.setItem('jwtToken', res.data.token);
-                var intervalID = setInterval(function() {
+                this.props.history.push('/forum');
+                var intervalID = setInterval(function () {
                     const oldToken = {
-                        'token' : localStorage.getItem('jwtToken')
+                        'token': localStorage.getItem('jwtToken')
                     }
                     axios.post('http://localhost:8000/token_renew/', oldToken).then(res => {
                         window.localStorage.setItem('jwtToken', res.data.token);
-                    }).catch(function(error) {
+                    }).catch(function (error) {
                         if (error.response) {
                             clearInterval(intervalID);
                         }
@@ -34,7 +31,7 @@ class Login extends React.Component {
 
     render() {
         return (
-            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <form onSubmit={this.handleSubmit}>
                     <div className="form-group">
                         <label>Username:</label>
@@ -55,4 +52,4 @@ class Login extends React.Component {
     }
 }
 
-export default Login;
+export default withRouter(Login);

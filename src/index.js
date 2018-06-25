@@ -9,36 +9,75 @@ import Login from '../src/login/index';
 import SignUp from '../src/signup/index';
 import Forum from '../src/forum/index';
 
-
 class Home extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isLoggedIn: Boolean(localStorage.getItem('jwtToken'))
+    }
+
+    this.handler = this.handler.bind(this)
+  }
+
+  handleLogout = () => {
+    if (localStorage.getItem('jwtToken')) {
+      localStorage.removeItem('jwtToken')
+      this.setState({
+        isLoggedIn: false
+      })
+    }
+  }
+
+  handler = () => {
+    console.log(this.isLoggedIn);
+    this.setState({
+      isLoggedIn: true
+    })
+  }
 
   render() {
     return (
       <div>
         <BrowserRouter>
           <div>
-            <AppBar position='static' style={{marginBottom: 20}}>
+            <AppBar position='static' style={{ marginBottom: 20 }}>
               <Toolbar>
-                <Typography variant="title" color="inherit" style={{flex: 1}}>
-                  MySite
+                <Typography variant="title" color="inherit" style={{ flex: 1 }}>
+                  My Site
                 </Typography>
-                <NavLink to="/login">
-                <Button style={{color: 'white', fontSize: 12, marginRight: 20}}>Login</Button>
-                </NavLink>
-                <NavLink to="/signup">
-                  <Button style={{color: 'white', fontSize: 12, marginRight: 20}}>SignUp</Button>
-                </NavLink>
-                <NavLink to="/forum">
-                  <Button style={{color: 'white', fontSize: 12, marginRight: 20}}>Forum</Button>
-                </NavLink>
+                {this.isLoggedIn ? (
+                  <div>
+                    <NavLink to="/forum">
+                      <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>Forum</Button>
+                    </NavLink>
+                    <NavLink to="/">
+                      <Button onClick={this.handleLogout} style={{ color: 'white', fontSize: 12, marginRight: 20 }}>Logout</Button>
+                    </NavLink>
+                  </div>
+                ) : (
+                    <div>
+                      <NavLink to="/login">
+                        <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>Login</Button>
+                      </NavLink>
+                      <NavLink to="/signup">
+                        <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>SignUp</Button>
+                      </NavLink>
+                    </div>
+                  )
+                }
               </Toolbar>
             </AppBar>
-            <Route exact path="/login" component={Login} />
+            <Route exact path="/login" render={() => 
+              <Login handler = {this.handler} />
+            }/>
+            {/*component={Login}*/}  
             <Route exact path="/signup" component={SignUp} />
-            <Route exact path="/forum" component={Forum} />
+            <Route exact path="/forum" component={Forum}  />
           </div>
-        </BrowserRouter>
-      </div>
+        </BrowserRouter >
+      </div >
     );
   }
 }
