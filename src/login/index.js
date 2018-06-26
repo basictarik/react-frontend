@@ -13,6 +13,7 @@ class Login extends React.Component {
         axios.post('http://localhost:8000/login/', loginCredentials).
             then(res => {
                 window.localStorage.setItem('jwtToken', res.data.token);
+                this.props.handler();
                 this.props.history.push('/forum');
                 var intervalID = setInterval(function () {
                     const oldToken = {
@@ -25,7 +26,7 @@ class Login extends React.Component {
                             clearInterval(intervalID);
                         }
                     })
-                }, 20 * 60 * 1000 - 1000);
+                }, 20 * 59 * 1000);
             });
     }
 

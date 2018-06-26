@@ -15,6 +15,7 @@
     "javascript-time-ago": "^1.0.30",
     "jquery": "^3.3.1",
     "jquery.js": "0.0.2-security",
+    "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "popper": "^1.0.1",
     "popper.js": "^1.14.3",
