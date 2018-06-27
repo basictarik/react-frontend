@@ -4,9 +4,11 @@ import AppBar from '@material-ui/core/AppBar';
 import Button from '@material-ui/core/Button';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import Home from '../Home/index';
 import Login from '../login/index';
 import SignUp from '../signup/index';
 import Forum from '../forum/index';
+import ErrorPage401 from '../err_page/err_401';
 import isTokenValid from '../utils/utils.js';
 
 class NavigationBar extends React.Component {
@@ -72,7 +74,11 @@ class NavigationBar extends React.Component {
                     <Login handler={this.handler} />
                 } />
                 <Route exact path="/signup" component={SignUp} />
-                <Route exact path="/forum" component={Forum} />
+                <Route exact path="/forum" render={() =>
+                    <Forum handler={this.handler} />
+                } />
+                <Route exact path="/error_401" component={ErrorPage401} />
+                <Route exact path="/" component={Home} />
             </div>
         )
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 import axios from 'axios';
-import {withRouter} from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 class Login extends React.Component {
 
@@ -10,24 +10,23 @@ class Login extends React.Component {
             username: e.target[0].value,
             password: e.target[1].value,
         }
-        axios.post('http://localhost:8000/login/', loginCredentials).
-            then(res => {
-                window.localStorage.setItem('jwtToken', res.data.token);
-                this.props.handler();
-                this.props.history.push('/forum');
-                var intervalID = setInterval(function () {
-                    const oldToken = {
-                        'token': localStorage.getItem('jwtToken')
+        axios.post('http://localhost:8000/login/', loginCredentials).then(res => {
+            window.localStorage.setItem('jwtToken', res.data.token);
+            this.props.handler();
+            this.props.history.push('/forum');
+            var intervalID = setInterval(function () {
+                const oldToken = {
+                    'token': localStorage.getItem('jwtToken')
+                }
+                axios.post('http://localhost:8000/token_renew/', oldToken).then(res => {
+                    window.localStorage.setItem('jwtToken', res.data.token);
+                }).catch(function (error) {
+                    if (error.response) {
+                        clearInterval(intervalID);
                     }
-                    axios.post('http://localhost:8000/token_renew/', oldToken).then(res => {
-                        window.localStorage.setItem('jwtToken', res.data.token);
-                    }).catch(function (error) {
-                        if (error.response) {
-                            clearInterval(intervalID);
-                        }
-                    })
-                }, 20 * 59 * 1000);
-            });
+                })
+            }, 20 * 59 * 1000);
+        });
     }
 
     render() {

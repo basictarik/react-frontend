@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import Pagination from 'react-js-pagination';
-import { Redirect } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import styles from './forum.css';
 import jwt_decode from 'jwt-decode';
 import TimeAgo from 'javascript-time-ago';
@@ -18,8 +18,7 @@ class Forum extends React.Component {
       posts_per_page: 5,
       activePage: 1,
       last_post: 5,
-      first_post: 0,
-      redirect: false
+      first_post: 0
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleChange2 = this.handleChange2.bind(this);
@@ -28,10 +27,8 @@ class Forum extends React.Component {
     this.redirectToLogin = this.redirectToLogin.bind(this);
   }
 
-  redirectToLogin = function () {
-    this.setState({
-      redirect: true
-    });
+  redirectToLogin = () => {
+    this.props.history.push('/login');
   }
 
   componentDidMount() {
@@ -42,7 +39,8 @@ class Forum extends React.Component {
       })
     }).catch(function (error) {
       if (error.response.status === 401) {
-        setTimeout(this.redirectToLogin, 3000)
+        this.props.history.push('/error_401');
+        setTimeout(this.redirectToLogin, 5000);
       }
     }.bind(this)
     )
@@ -92,10 +90,6 @@ class Forum extends React.Component {
   render() {
     TimeAgo.locale(en);
     const timeAgo = new TimeAgo('en-US');
-    const redirect = this.state.redirect;
-    if (redirect) {
-      return <Redirect to='/login' />;
-    }
     return (
       <div>
         Post Title:
@@ -143,4 +137,4 @@ class Forum extends React.Component {
   }
 }
 
-export default Forum;
+export default withRouter(Forum);
