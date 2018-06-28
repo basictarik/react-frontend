@@ -10,15 +10,15 @@ class Login extends React.Component {
             username: e.target[0].value,
             password: e.target[1].value,
         }
-        axios.post('http://localhost:8000/login/', loginCredentials).then(res => {
+        axios.post('http://192.168.131.72:8000/login/', loginCredentials).then(res => {
             window.localStorage.setItem('jwtToken', res.data.token);
             this.props.handler();
-            this.props.history.push('/forum');
+            this.props.history.push('/posts');
             var intervalID = setInterval(function () {
                 const oldToken = {
                     'token': localStorage.getItem('jwtToken')
                 }
-                axios.post('http://localhost:8000/token_renew/', oldToken).then(res => {
+                axios.post('http://192.168.131.72:8000/token_renew/', oldToken).then(res => {
                     window.localStorage.setItem('jwtToken', res.data.token);
                 }).catch(function (error) {
                     if (error.response) {

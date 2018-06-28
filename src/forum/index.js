@@ -1,11 +1,12 @@
 import React from 'react';
 import axios from 'axios';
 import Pagination from 'react-js-pagination';
-import { withRouter } from 'react-router-dom';
+import { withRouter, NavLink, Route } from 'react-router-dom';
 import styles from './forum.css';
 import jwt_decode from 'jwt-decode';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import Post from './post';
 
 class Forum extends React.Component {
   constructor(props) {
@@ -33,7 +34,7 @@ class Forum extends React.Component {
 
   componentDidMount() {
     axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-    axios.get("http://localhost:8000/posts/").then(res => {
+    axios.get("http://192.168.131.72:8000/posts/").then(res => {
       this.setState({
         postsList: res.data
       })
@@ -74,7 +75,7 @@ class Forum extends React.Component {
       post_text: this.state.inputPostText,
       original_poster: user_information.username,
     };
-    axios.post("http://localhost:8000/posts/", newPost).then(res => {
+    axios.post("http://192.168.131.72:8000/posts/", newPost).then(res => {
       const newPost = {
         post_title: res.data.post_title,
         post_text: res.data.post_text,
@@ -88,6 +89,7 @@ class Forum extends React.Component {
   };
 
   render() {
+    const match = this.props.match.path;
     TimeAgo.locale(en);
     const timeAgo = new TimeAgo('en-US');
     return (
@@ -114,7 +116,9 @@ class Forum extends React.Component {
             return (
               <div key={index} >
                 <header className={styles.head}>
+                <NavLink to={"/posts/" + post.id}>
                   <h2 className={styles.topic}>{post.post_title}</h2>
+                </NavLink>
                   <p>{"Posted by "} <span style={{ fontStyle: 'italic' }}>{post.original_poster + " " + timeAgo.format(Date.parse(post.date_posted))}</span></p>
                 </header>
                 <p>{post.post_text}</p>
@@ -132,6 +136,7 @@ class Forum extends React.Component {
             onChange={this.handlePageChange}
           />
         </div>
+        <Route path={`${match}/:id`} component={Post} />
       </div>
     );
   }
