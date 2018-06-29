@@ -34,7 +34,7 @@ class Forum extends React.Component {
 
   componentDidMount() {
     axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-    axios.get("http://192.168.131.72:8000/posts/").then(res => {
+    axios.get("http://192.168.131.72:8000/posts").then(res => {
       this.setState({
         postsList: res.data
       })
