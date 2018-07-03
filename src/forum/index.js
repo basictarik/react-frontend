@@ -7,6 +7,7 @@ import jwt_decode from 'jwt-decode';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Post from './post';
+import $ from 'jquery';
 
 class Forum extends React.Component {
   constructor(props) {
@@ -26,6 +27,7 @@ class Forum extends React.Component {
     this.handleClick = this.handleClick.bind(this);
     this.handlePageChange = this.handlePageChange.bind(this);
     this.redirectToLogin = this.redirectToLogin.bind(this);
+    this.filterPosts = this.filterPosts.bind(this);
   }
 
   redirectToLogin = () => {
@@ -34,7 +36,7 @@ class Forum extends React.Component {
 
   componentDidMount() {
     axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-    axios.get("http://192.168.131.72:8000/posts").then(res => {
+    axios.get("http://192.168.131.72:8000/posts/").then(res => {
       this.setState({
         postsList: res.data
       })
@@ -88,37 +90,61 @@ class Forum extends React.Component {
     })
   };
 
+  filterPosts = (e) => {
+    var queryUrl = 'http://192.168.131.72:8000/posts/';
+    var filterValue = $('#user-filter').val();
+    if (filterValue) {
+      queryUrl = queryUrl + "?original_poster=" + filterValue;
+    }
+    axios.get(queryUrl).then(res => {
+      this.setState({
+        postsList : res.data
+      })
+    })
+  }
+
   render() {
     const match = this.props.match.path;
     TimeAgo.locale(en);
     const timeAgo = new TimeAgo('en-US');
     return (
       <div>
-        Post Title:
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignContent: 'space-between' }}>
+          <div style={{ width: '50%' }}>
+            Post Title:
         <input
-          id="new-post"
-          onChange={this.handleChange}
-          value={this.state.text}
-        />
-        <br />
-        <br />
-        Post Text:
+              id="new-post"
+              onChange={this.handleChange}
+              value={this.state.text}
+            />
+            <br />
+            <br />
+            Post Text:
         <input
-          id="new-text"
-          onChange={this.handleChange2}
-          value={this.state.text}
-        />
-        <button className='btn-danger' onClick={this.handleClick}>
-          {'Add new post'}
-        </button>
+              id="new-text"
+              onChange={this.handleChange2}
+              value={this.state.text}
+            />
+            <button className='btn-danger' onClick={this.handleClick}>
+              {'Add new post'}
+            </button>
+          </div>
+          <div style={{ width: '50%' }}>
+            Username:
+            <input id="user-filter" value={this.state.text} />
+            <button className='btn.danger' onClick={this.filterPosts}>
+            {'Filter Posts'}
+            </button>
+          </div>
+        </div>
         <div>
           {this.state.postsList.slice(this.state.first_post, this.state.last_post).map(function (post, index) {
             return (
               <div key={index} >
                 <header className={styles.head}>
-                <NavLink to={"/posts/" + post.id}>
-                  <h2 className={styles.topic}>{post.post_title}</h2>
-                </NavLink>
+                  <NavLink to={"/posts/" + post.id}>
+                    <h2 className={styles.topic}>{post.post_title}</h2>
+                  </NavLink>
                   <p>{"Posted by "} <span style={{ fontStyle: 'italic' }}>{post.original_poster + " " + timeAgo.format(Date.parse(post.date_posted))}</span></p>
                 </header>
                 <p>{post.post_text}</p>
