@@ -99,7 +99,10 @@ class Forum extends React.Component {
     }
     axios.get(queryUrl).then(res => {
       this.setState({
-        postsList: res.data
+        postsList: res.data,
+        activePage: 1,
+        last_post: this.state.posts_per_page,
+        first_post: this.state.posts_per_page - this.state.posts_per_page
       })
     })
   };
@@ -110,7 +113,10 @@ class Forum extends React.Component {
       axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
     axios.get("http://192.168.131.72:8000/posts/").then(res => {
       this.setState({
-        postsList: res.data
+        postsList: res.data,
+        activePage: 1,
+        last_post: this.state.posts_per_page,
+        first_post: this.state.posts_per_page - this.state.posts_per_page
       })
     }).catch(function (error) {
       if (error.response.status === 401) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import styles from './post.css';
 
 class Post extends React.Component {
 
@@ -28,8 +29,8 @@ class Post extends React.Component {
         return (
             <div>
                 <h1>{this.state.OP}</h1>
-                <h1>{this.state.post_title}</h1>
-                <h1>{this.state.post_text}</h1>
+                <h1 className={styles.title}>{this.state.post_title}</h1>
+                <h1 className={styles.body}>{this.state.post_text}</h1>
             </div>
         )
     }
