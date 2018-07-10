@@ -13,14 +13,13 @@ class Forum extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      counter: 1,
       postsList: [],
       inputPostTitle: "",
       inputPostText: "",
       posts_per_page: 5,
       activePage: 1,
-      last_post: 5,
-      first_post: 0
+      numberOfPosts: 1,
+      filter: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleChange2 = this.handleChange2.bind(this);
@@ -36,10 +35,13 @@ class Forum extends React.Component {
   }
 
   componentDidMount() {
+    var query = 'http://192.168.131.72:8000/posts/?page=' + this.state.activePage;
     axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-    axios.get("http://192.168.131.72:8000/posts/").then(res => {
+    axios.get(query).then(res => {
+      this.props.history.push('/posts/?page=' + this.state.activePage)
       this.setState({
-        postsList: res.data
+        postsList: res.data.allPosts,
+        numberOfPosts: res.data.numberOfPosts
       })
     }).catch(function (error) {
       if (error.response.status === 401) {
@@ -51,11 +53,18 @@ class Forum extends React.Component {
   }
 
   handlePageChange(pageNumber) {
-    this.setState({
-      activePage: pageNumber,
-      last_post: this.state.posts_per_page * pageNumber,
-      first_post: this.state.posts_per_page * pageNumber - this.state.posts_per_page
-    });
+    var query = 'http://192.168.131.72:8000/posts/?page=' + pageNumber;
+    var filterValue = $('#user-filter').val();
+    if (filterValue && this.state.filter) {
+      query = query + "&original_poster=" + filterValue;
+    }
+    axios.get(query).then(res => {
+      this.props.history.push('/posts/?page=' + pageNumber)
+      this.setState({
+        postsList: res.data.allPosts,
+        activePage: pageNumber
+      });
+    })
   }
 
   handleChange(e) {
@@ -79,30 +88,36 @@ class Forum extends React.Component {
       original_poster: user_information.username,
     };
     axios.post("http://192.168.131.72:8000/posts/", newPost).then(res => {
-      const newPost = {
-        post_title: res.data.post_title,
-        post_text: res.data.post_text,
-        original_poster: res.data.original_poster,
-        date_posted: new Date().toISOString(),
-      };
-      this.setState(prevState => ({
-        postsList: prevState.postsList.concat(newPost)
-      }))
+      var query = 'http://192.168.131.72:8000/posts/?page=' + this.state.activePage;
+      var filterValue = $('#user-filter').val();
+      if (this.state.filter && filterValue) {
+        query = query + '&original_poster=' + filterValue;
+      }
+      axios.get(query).then(res => {
+        this.setState({
+          postsList: res.data.allPosts,
+          numberOfPosts: res.data.numberOfPosts
+        })
+      })
+      
     })
   };
 
   filterPosts = (e) => {
-    var queryUrl = 'http://192.168.131.72:8000/posts/';
+    var query = 'http://192.168.131.72:8000/posts/?page=1';
     var filterValue = $('#user-filter').val();
+    var filterOn = true;
     if (filterValue) {
-      queryUrl = queryUrl + "?original_poster=" + filterValue;
+      query = query + "&original_poster=" + filterValue;
+    } else {
+      filterOn = false;
     }
-    axios.get(queryUrl).then(res => {
+    axios.get(query).then(res => {
       this.setState({
-        postsList: res.data,
+        postsList: res.data.allPosts,
+        numberOfPosts: res.data.numberOfPosts,
         activePage: 1,
-        last_post: this.state.posts_per_page,
-        first_post: this.state.posts_per_page - this.state.posts_per_page
+        filter: filterOn
       })
     })
   };
@@ -111,12 +126,10 @@ class Forum extends React.Component {
     var url = 'http://192.168.131.72:8000/posts/' + id;
     axios.delete(url).then(res => {
       axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-    axios.get("http://192.168.131.72:8000/posts/").then(res => {
+      axios.get("http://192.168.131.72:8000/posts/?page=" + this.state.activePage).then(res => {
       this.setState({
         postsList: res.data,
         activePage: 1,
-        last_post: this.state.posts_per_page,
-        first_post: this.state.posts_per_page - this.state.posts_per_page
       })
     }).catch(function (error) {
       if (error.response.status === 401) {
@@ -155,7 +168,7 @@ class Forum extends React.Component {
           </div>
         </div>
         <div>
-          {this.state.postsList.slice(this.state.first_post, this.state.last_post).map((post, index) => {
+          {this.state.postsList.map((post, index) => {
             return (
               <div key={index} >
                 <header className={styles.head}>
@@ -175,7 +188,7 @@ class Forum extends React.Component {
           <Pagination
             activePage={this.state.activePage}
             itemsCountPerPage={this.state.posts_per_page}
-            totalItemsCount={this.state.postsList.length}
+            totalItemsCount={this.state.numberOfPosts}
             pageRangeDisplayed={5}
             onChange={this.handlePageChange}
           />
