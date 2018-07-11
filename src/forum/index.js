@@ -27,7 +27,7 @@ class Forum extends React.Component {
     this.handlePageChange = this.handlePageChange.bind(this);
     this.redirectToLogin = this.redirectToLogin.bind(this);
     this.filterPosts = this.filterPosts.bind(this);
-    
+
   }
 
   redirectToLogin = () => {
@@ -59,7 +59,7 @@ class Forum extends React.Component {
       query = query + "&original_poster=" + filterValue;
     }
     axios.get(query).then(res => {
-      this.props.history.push('/posts/?page=' + pageNumber)
+      this.props.history.push('/posts/?page=' + pageNumber);
       this.setState({
         postsList: res.data.allPosts,
         activePage: pageNumber
@@ -99,7 +99,6 @@ class Forum extends React.Component {
           numberOfPosts: res.data.numberOfPosts
         })
       })
-      
     })
   };
 
@@ -113,6 +112,7 @@ class Forum extends React.Component {
       filterOn = false;
     }
     axios.get(query).then(res => {
+      this.props.history.push('/posts/?page=' + 1)
       this.setState({
         postsList: res.data.allPosts,
         numberOfPosts: res.data.numberOfPosts,
@@ -126,18 +126,41 @@ class Forum extends React.Component {
     var url = 'http://192.168.131.72:8000/posts/' + id;
     axios.delete(url).then(res => {
       axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-      axios.get("http://192.168.131.72:8000/posts/?page=" + this.state.activePage).then(res => {
-      this.setState({
-        postsList: res.data,
-        activePage: 1,
-      })
-    }).catch(function (error) {
-      if (error.response.status === 401) {
-        this.props.history.push('/error_401');
-        setTimeout(this.redirectToLogin, 5000);
+      var query = 'http://192.168.131.72:8000/posts/?page=' + this.state.activePage;
+      var filterValue = $('#user-filter').val();
+      if (this.state.filter && filterValue) {
+        query = query + '&original_poster=' + filterValue;
       }
-    }.bind(this)
-    )
+      axios.get(query).then(res => {
+        let returnOnePage = 0;
+        if (res.data.allPosts.length === 0) {
+          let op = "";
+          if (this.state.filter) {
+            op = '&original_poster=' + filterValue;
+          }
+          axios.get(`http://192.168.131.72:8000/posts/?page=${this.state.activePage - 1}${op}`).then(res => {
+            this.props.history.push('/posts/?page=' + (this.state.activePage - 1));
+            this.setState((prevState) => ({
+              postsList: res.data.allPosts,
+              numberOfPosts: res.data.numberOfPosts,
+              activePage: prevState.activePage - 1
+            }))
+          })
+        } else {
+          this.props.history.push('/posts/?page=' + this.state.activePage);
+          this.setState((prevState) => ({
+            postsList: res.data.allPosts,
+            numberOfPosts: res.data.numberOfPosts,
+            activePage: prevState.activePage - returnOnePage
+          }))
+        }
+      }).catch(function (error) {
+        if (error.response.status === 401) {
+          this.props.history.push('/error_401');
+          setTimeout(this.redirectToLogin, 5000);
+        }
+      }.bind(this)
+      )
     })
   }
 
@@ -175,7 +198,7 @@ class Forum extends React.Component {
                   <NavLink to={"/posts/" + post.id}>
                     <h2 className={styles.topic}>{post.post_title}</h2>
                   </NavLink>
-                  <button onClick={() => {this.deletePost(post.id)}}>{'Delete'}</button>
+                  <button onClick={() => { this.deletePost(post.id) }}>{'Delete'}</button>
                   <p>{"Posted by "} <span style={{ fontStyle: 'italic' }}>{post.original_poster + " " + timeAgo.format(Date.parse(post.date_posted))}</span></p>
                 </header>
                 <p>{post.post_text}</p>
