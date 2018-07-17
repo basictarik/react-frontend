@@ -5,6 +5,9 @@ export default function isTokenValid() {
         return false;
     }
     const decodedToken = jwt.decode(localStorage.getItem('jwtToken'));
-    const date = new Date();
-    return decodedToken.exp < date;
+    let tokenExparition = decodedToken.exp;
+    let date = Date.now();
+    date = date.toString().slice(0, -3);
+    date = parseInt(date, 10);
+    return (tokenExparition > date);
 }

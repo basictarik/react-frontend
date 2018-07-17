@@ -54,7 +54,7 @@ class NavigationBar extends React.Component {
                                 <NavLink to="/posts">
                                     <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>Forum</Button>
                                 </NavLink>
-                                <NavLink to="/login">
+                                <NavLink to="/">
                                     <Button onClick={this.handleLogout} style={{ color: 'white', fontSize: 12, marginRight: 20 }}>Logout</Button>
                                 </NavLink>
                             </div>

@@ -1,13 +1,13 @@
 import React from 'react';
 import axios from 'axios';
-import Pagination from 'react-js-pagination';
-import { withRouter, NavLink, Route } from 'react-router-dom';
+import ReactPaginate from 'react-paginate';
+import { withRouter, NavLink } from 'react-router-dom';
 import styles from './forum.css';
 import jwt_decode from 'jwt-decode';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import Post from './post';
 import $ from 'jquery';
+import qs from 'query-string';
 
 class Forum extends React.Component {
   constructor(props) {
@@ -17,7 +17,7 @@ class Forum extends React.Component {
       inputPostTitle: "",
       inputPostText: "",
       posts_per_page: 5,
-      activePage: 1,
+      activePage: qs.parse(this.props.location.search).page,
       numberOfPosts: 1,
       filter: false
     };
@@ -27,7 +27,6 @@ class Forum extends React.Component {
     this.handlePageChange = this.handlePageChange.bind(this);
     this.redirectToLogin = this.redirectToLogin.bind(this);
     this.filterPosts = this.filterPosts.bind(this);
-
   }
 
   redirectToLogin = () => {
@@ -35,13 +34,17 @@ class Forum extends React.Component {
   }
 
   componentDidMount() {
-    var query = 'http://192.168.131.72:8000/posts/?page=' + this.state.activePage;
+    var page = qs.parse(this.props.location.search).page;
+    if (page == null) {
+      page = 1;
+    }
+    var query = 'http://192.168.131.72:8000/posts/?page=' + page;
     axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
     axios.get(query).then(res => {
-      this.props.history.push('/posts/?page=' + this.state.activePage)
       this.setState({
         postsList: res.data.allPosts,
-        numberOfPosts: res.data.numberOfPosts
+        numberOfPosts: res.data.numberOfPosts,
+        activePage: page
       })
     }).catch(function (error) {
       if (error.response.status === 401) {
@@ -52,18 +55,46 @@ class Forum extends React.Component {
     )
   }
 
-  handlePageChange(pageNumber) {
+  componentWillReceiveProps(nextProps) {
+    var page = qs.parse(nextProps.location.search).page;
+    if (page == null) {
+      page = 1;
+    }
+    var query = 'http://192.168.131.72:8000/posts/?page=' + page;
+    var filterValue = $('#user-filter').val();
+    if (filterValue && this.state.filter) {
+      query = query + "&original_poster=" + filterValue;
+    }
+    axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
+    axios.get(query).then(res => {
+      this.setState({
+        postsList: res.data.allPosts,
+        numberOfPosts: res.data.numberOfPosts,
+        activePage: page
+      })
+    }).catch(function (error) {
+      if (error.response.status === 401) {
+        this.props.history.push('/error_401');
+        setTimeout(this.redirectToLogin, 5000);
+      }
+    }.bind(this)
+    )
+  }
+
+
+  handlePageChange(data) {
+    var pageNumber = data.selected + 1;
     var query = 'http://192.168.131.72:8000/posts/?page=' + pageNumber;
     var filterValue = $('#user-filter').val();
     if (filterValue && this.state.filter) {
       query = query + "&original_poster=" + filterValue;
     }
     axios.get(query).then(res => {
-      this.props.history.push('/posts/?page=' + pageNumber);
       this.setState({
         postsList: res.data.allPosts,
         activePage: pageNumber
       });
+      this.props.history.push('/posts/?page=' + pageNumber);
     })
   }
 
@@ -112,13 +143,13 @@ class Forum extends React.Component {
       filterOn = false;
     }
     axios.get(query).then(res => {
-      this.props.history.push('/posts/?page=' + 1)
       this.setState({
         postsList: res.data.allPosts,
         numberOfPosts: res.data.numberOfPosts,
-        activePage: 1,
+        activePage: 0,
         filter: filterOn
       })
+      this.props.history.push('/posts/?page=' + 1)
     })
   };
 
@@ -165,9 +196,12 @@ class Forum extends React.Component {
   }
 
   render() {
-    const match = this.props.match.path;
     TimeAgo.locale(en);
     const timeAgo = new TimeAgo('en-US');
+    var thePage = qs.parse(this.props.location.search).page;
+    if (thePage == null) {
+      thePage = 1;
+    }
     return (
       <div>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignContent: 'space-between' }}>
@@ -207,16 +241,19 @@ class Forum extends React.Component {
           }
           )}
         </div>
-        <div>
-          <Pagination
-            activePage={this.state.activePage}
-            itemsCountPerPage={this.state.posts_per_page}
-            totalItemsCount={this.state.numberOfPosts}
+          <ReactPaginate
+            pageCount={Math.ceil(this.state.numberOfPosts / this.state.posts_per_page)}
             pageRangeDisplayed={5}
-            onChange={this.handlePageChange}
-          />
-        </div>
-        <Route path={`${match}/:id`} component={Post} />
+            marginPagesDisplayed={2}
+            initialPage={thePage - 1}
+            onPageChange={this.handlePageChange}
+            disableInitialCallback={true}
+            containerClassName={"pagination"}
+            subContainerClassName={"pages pagination"}
+            activeClassName={"active"}
+            breakLabel={<a href="">...</a>}
+            forcePage={thePage - 1}
+          />       
       </div>
     );
   }

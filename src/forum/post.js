@@ -28,9 +28,9 @@ class Post extends React.Component {
     render() {
         return (
             <div>
-                <h1>{this.state.OP}</h1>
-                <h1 className={styles.title}>{this.state.post_title}</h1>
+                <h1>{this.state.post_title}</h1>
                 <h1 className={styles.body}>{this.state.post_text}</h1>
+                <h1 className={styles.poster}>{this.state.OP}</h1>
             </div>
         )
     }
