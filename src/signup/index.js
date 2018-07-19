@@ -29,11 +29,15 @@ class SignUp extends React.Component {
     handleSubmit(e) {
         e.preventDefault();
         const newUser = {
+            user: {
             first_name: e.target[0].value,
             last_name: e.target[1].value,
             username: e.target[2].value,
             password: e.target[3].value,
             email: e.target[5].value
+            },
+            first_name: e.target[0].value,
+            last_name: e.target[1].value
         }
         axios.post('http://192.168.131.72:8000/signup/', newUser)
     }

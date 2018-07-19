@@ -81,7 +81,6 @@ class Forum extends React.Component {
     )
   }
 
-
   handlePageChange(data) {
     var pageNumber = data.selected + 1;
     var query = 'http://192.168.131.72:8000/posts/?page=' + pageNumber;
