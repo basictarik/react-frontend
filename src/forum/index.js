@@ -232,7 +232,7 @@ class Forum extends React.Component {
                     <h2 className={styles.topic}>{post.post_title}</h2>
                   </NavLink>
                   <button onClick={() => { this.deletePost(post.id) }}>{'Delete'}</button>
-                  <p>{"Posted by "} <span style={{ fontStyle: 'italic' }}>{post.original_poster + " " + timeAgo.format(Date.parse(post.date_posted))}</span></p>
+                  <p>{"Posted by "} <span style={{ fontStyle: 'italic' }}><NavLink to={"/profiles/" + post.original_poster}>{post.original_poster}</NavLink>{" " + timeAgo.format(Date.parse(post.date_posted))}</span></p>
                 </header>
                 <p>{post.post_text}</p>
               </div>
@@ -240,19 +240,19 @@ class Forum extends React.Component {
           }
           )}
         </div>
-          <ReactPaginate
-            pageCount={Math.ceil(this.state.numberOfPosts / this.state.posts_per_page)}
-            pageRangeDisplayed={5}
-            marginPagesDisplayed={2}
-            initialPage={thePage - 1}
-            onPageChange={this.handlePageChange}
-            disableInitialCallback={true}
-            containerClassName={"pagination"}
-            subContainerClassName={"pages pagination"}
-            activeClassName={"active"}
-            breakLabel={<a href="">...</a>}
-            forcePage={thePage - 1}
-          />       
+        <ReactPaginate
+          pageCount={Math.ceil(this.state.numberOfPosts / this.state.posts_per_page)}
+          pageRangeDisplayed={5}
+          marginPagesDisplayed={2}
+          initialPage={thePage - 1}
+          onPageChange={this.handlePageChange}
+          disableInitialCallback={true}
+          containerClassName={"pagination"}
+          subContainerClassName={"pages pagination"}
+          activeClassName={"active"}
+          breakLabel={<a href="">...</a>}
+          forcePage={thePage - 1}
+        />
       </div>
     );
   }

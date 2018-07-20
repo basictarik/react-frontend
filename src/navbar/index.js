@@ -9,6 +9,7 @@ import Login from '../login/index';
 import SignUp from '../signup/index';
 import Forum from '../forum/index';
 import Post from '../forum/post';
+import UserProfile from '../profile/index';
 import ErrorPage401 from '../err_page/err_401';
 import isTokenValid from '../utils/utils.js';
 
@@ -59,14 +60,14 @@ class NavigationBar extends React.Component {
                                 </NavLink>
                             </div>
                         ) : (
-                            <div>
-                                <NavLink to="/login">
-                                    <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>Login</Button>
-                                </NavLink>
-                                <NavLink to="/signup">
-                                    <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>SignUp</Button>
-                                </NavLink>
-                            </div>
+                                <div>
+                                    <NavLink to="/login">
+                                        <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>Login</Button>
+                                    </NavLink>
+                                    <NavLink to="/signup">
+                                        <Button style={{ color: 'white', fontSize: 12, marginRight: 20 }}>SignUp</Button>
+                                    </NavLink>
+                                </div>
                             )
                         }
                     </Toolbar>
@@ -75,21 +76,13 @@ class NavigationBar extends React.Component {
                     <Login handler={this.handler} />
                 } />
                 <Route exact path="/signup" component={SignUp} />
-                {/*
-                <Route exact path="/posts">
-                    <Forum handler={this.handler}>
-                        <Route path=":id" component={Post} />
-                    </Forum>
-                </Route>*/}
-
                 <Route exact path="/posts" render={() =>
                     <Forum handler={this.handler} />
                 }>
-                
-                    
-            </Route>
-            <Route path="/posts/:id" component={Post} />
+                </Route>
+                <Route path="/posts/:id" component={Post} />
                 <Route exact path="/error_401" component={ErrorPage401} />
+                <Route exact path="/profiles/:profilename" component={UserProfile} />
                 <Route exact path="/" component={Home} />
             </div>
         )
