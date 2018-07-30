@@ -8,35 +8,45 @@ class UserProfile extends React.Component {
         this.state = {
             first_name: "",
             last_name: "",
-            profile_pic: "",
-            selected_file: ""
+            profile_image: "Blank.jpg",
+            selected_file: null
         }
     }
 
     componentDidMount() {
         var username = this.props.match.params.profilename;
-        console.log(username);
         axios.get('http://192.168.131.72:8000/profiles/' + username).then(res => {
-            console.log(res.data.first_name);
-            console.log(res.data.last_name);
-            console.log(res.data.profile_image);
             this.setState({
                 first_name: res.data.first_name,
                 last_name: res.data.last_name,
-                profile_pic: res.data.profile_image
+                profile_image: res.data.profile_image
             });
-        })
-        
+        });
     }
 
     selectedFileHandler = (event) => {
+        var image = event.target.files[0];
         this.setState({
-            selected_file: event.target.files[0]
+            selected_file: image
         });
     }
 
     fileUploadHandler = () => {
-        axios.put('http://192.168.131.72:8000/')
+        var username = this.props.match.params.profilename;
+        const fd = new FormData();
+        const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+        fd.append('image', this.state.selected_file, this.state.selected_file.name)
+        const profileInformation = {
+            profile_image: this.state.selected_file.name
+        }
+        var url = 'http://192.168.131.72:8000/profiles/' + username + '/image_upload';
+        axios.post(url, fd, config).then(res => {
+            axios.patch('http://192.168.131.72:8000/profiles/' + username + '/profile_update', profileInformation).then(response => {
+                this.setState({
+                    profile_image: profileInformation.profile_image
+                });
+            });
+        });
     }
 
     render() {
@@ -44,12 +54,11 @@ class UserProfile extends React.Component {
             <div>
                 <input type="file" onChange={this.selectedFileHandler} />
                 <button onClick={this.fileUploadHandler}>Upload</button>
-                <h1>{'Ovo je profil cim rijesim backend ' + this.props.match.params.profilename}</h1>
-                <img alt="" src={ 'http://192.168.131.72:8000/media/images/no-image.jpg' } height="100" width="100" />
+                <h1>{'Profile- ' + this.props.match.params.profilename}</h1>
+                <img alt="" src={ 'http://192.168.131.72:8000/media/images/' + this.state.profile_image} height="100" width="100" />
             </div>
         )
     }
-
 
 }
 
