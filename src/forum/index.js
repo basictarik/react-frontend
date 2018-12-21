@@ -38,7 +38,7 @@ class Forum extends React.Component {
     if (page == null) {
       page = 1;
     }
-    var query = 'http://192.168.131.72:8000/posts/?page=' + page;
+    var query = 'localhost:8000/posts/?page=' + page;
     axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
     axios.get(query).then(res => {
       this.setState({
@@ -60,7 +60,7 @@ class Forum extends React.Component {
     if (page == null) {
       page = 1;
     }
-    var query = 'http://192.168.131.72:8000/posts/?page=' + page;
+    var query = 'localhost:8000/posts/?page=' + page;
     var filterValue = $('#user-filter').val();
     if (filterValue && this.state.filter) {
       query = query + "&original_poster=" + filterValue;
@@ -83,7 +83,7 @@ class Forum extends React.Component {
 
   handlePageChange(data) {
     var pageNumber = data.selected + 1;
-    var query = 'http://192.168.131.72:8000/posts/?page=' + pageNumber;
+    var query = 'localhost:8000/posts/?page=' + pageNumber;
     var filterValue = $('#user-filter').val();
     if (filterValue && this.state.filter) {
       query = query + "&original_poster=" + filterValue;
@@ -117,8 +117,8 @@ class Forum extends React.Component {
       post_text: this.state.inputPostText,
       original_poster: user_information.username,
     };
-    axios.post("http://192.168.131.72:8000/posts/", newPost).then(res => {
-      var query = 'http://192.168.131.72:8000/posts/?page=' + this.state.activePage;
+    axios.post("localhost:8000/posts/", newPost).then(res => {
+      var query = 'localhost:8000/posts/?page=' + this.state.activePage;
       var filterValue = $('#user-filter').val();
       if (this.state.filter && filterValue) {
         query = query + '&original_poster=' + filterValue;
@@ -133,7 +133,7 @@ class Forum extends React.Component {
   };
 
   filterPosts = (e) => {
-    var query = 'http://192.168.131.72:8000/posts/?page=1';
+    var query = 'localhost:8000/posts/?page=1';
     var filterValue = $('#user-filter').val();
     var filterOn = true;
     if (filterValue) {
@@ -153,10 +153,10 @@ class Forum extends React.Component {
   };
 
   deletePost = (id) => {
-    var url = 'http://192.168.131.72:8000/posts/' + id;
+    var url = 'localhost:8000/posts/' + id;
     axios.delete(url).then(res => {
       axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-      var query = 'http://192.168.131.72:8000/posts/?page=' + this.state.activePage;
+      var query = 'localhost:8000/posts/?page=' + this.state.activePage;
       var filterValue = $('#user-filter').val();
       if (this.state.filter && filterValue) {
         query = query + '&original_poster=' + filterValue;
@@ -168,7 +168,7 @@ class Forum extends React.Component {
           if (this.state.filter) {
             op = '&original_poster=' + filterValue;
           }
-          axios.get(`http://192.168.131.72:8000/posts/?page=${this.state.activePage - 1}${op}`).then(res => {
+          axios.get(`localhost:8000/posts/?page=${this.state.activePage - 1}${op}`).then(res => {
             this.props.history.push('/posts/?page=' + (this.state.activePage - 1));
             this.setState((prevState) => ({
               postsList: res.data.allPosts,

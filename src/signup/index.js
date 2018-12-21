@@ -39,7 +39,7 @@ class SignUp extends React.Component {
             first_name: e.target[0].value,
             last_name: e.target[1].value
         }
-        axios.post('http://192.168.131.72:8000/signup/', newUser)
+        axios.post('localhost:8000/signup/', newUser)
     }
 
     render() {

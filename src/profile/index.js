@@ -15,7 +15,7 @@ class UserProfile extends React.Component {
 
     componentDidMount() {
         var username = this.props.match.params.profilename;
-        axios.get('http://192.168.131.72:8000/profiles/' + username).then(res => {
+        axios.get('localhost:8000/profiles/' + username).then(res => {
             this.setState({
                 first_name: res.data.first_name,
                 last_name: res.data.last_name,
@@ -39,9 +39,9 @@ class UserProfile extends React.Component {
         const profileInformation = {
             profile_image: this.state.selected_file.name
         }
-        var url = 'http://192.168.131.72:8000/profiles/' + username + '/image_upload';
+        var url = 'localhost:8000/profiles/' + username + '/image_upload';
         axios.post(url, fd, config).then(res => {
-            axios.patch('http://192.168.131.72:8000/profiles/' + username + '/profile_update', profileInformation).then(response => {
+            axios.patch('localhost:8000/profiles/' + username + '/profile_update', profileInformation).then(response => {
                 this.setState({
                     profile_image: profileInformation.profile_image
                 });
@@ -55,7 +55,7 @@ class UserProfile extends React.Component {
                 <input type="file" onChange={this.selectedFileHandler} />
                 <button onClick={this.fileUploadHandler}>Upload</button>
                 <h1>{'Profile- ' + this.props.match.params.profilename}</h1>
-                <img alt="" src={ 'http://192.168.131.72:8000/media/images/' + this.state.profile_image} height="100" width="100" />
+                <img alt="" src={ 'localhost:8000/media/images/' + this.state.profile_image} height="100" width="100" />
             </div>
         )
     }

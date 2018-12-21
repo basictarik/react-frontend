@@ -16,7 +16,7 @@ class Post extends React.Component {
     componentDidMount() {
         const id = this.props.match.params.id;
         axios.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('jwtToken');
-        axios.get('http://192.168.131.72:8000/posts/' + id).then(res => {
+        axios.get('localhost:8000/posts/' + id).then(res => {
             this.setState({
                 post_text : res.data.post_text,
                 post_title : res.data.post_title,
